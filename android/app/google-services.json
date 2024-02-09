@@ -1,0 +1,30 @@
+
+{
+  "project_info": {
+    "project_number": "360309745955",
+    "project_id": "whatsapp-projeto-e20df",
+    "storage_bucket": "whatsapp-projeto-e20df.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:360309745955:android:714246e9e6320bf26e4496",
+        "android_client_info": {
+          "package_name": "com.example.whatsapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCe6NH6A3-edrbRtlYesualAvbya5KRJVI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
