@@ -1,14 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:whatsapp/login.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  FirebaseFirestore.instance
-      .collection("users")
-      .doc("001")
-      .set({"nome": "Matheus Xavier"});
   runApp(const MyApp());
 }
 
@@ -21,11 +18,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'WhatsApp',
       debugShowCheckedModeBanner: false,
+      home: const Login(),
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF075E54), secondary: const Color(0xFF25D366))
       ),
-      home: const Scaffold(),
     );
   }
 }
