@@ -2,6 +2,7 @@ class UserModel {
   late String _name;
   late String _email;
   late String _password;
+  late String _imageProfileUrl;
 
   UserModel();
 
@@ -9,6 +10,12 @@ class UserModel {
 
   set password(value) {
     _password = value;
+  }
+
+  get imageProfileUrl => _imageProfileUrl;
+
+  set imageProfileUrl(value) {
+    _imageProfileUrl = value;
   }
 
   get email => _email;

@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsapp/model/chat.dart';
+import 'package:whatsapp/model/user.dart';
 
 class ContactsPage extends StatefulWidget {
   const ContactsPage({super.key});
@@ -9,35 +12,95 @@ class ContactsPage extends StatefulWidget {
 }
 
 class _ContactsPageState extends State<ContactsPage> {
-  List<Chat> chatList = [
-    Chat("Matheus Xavier", "Olá tudo bem?",
-        "https://firebasestorage.googleapis.com/v0/b/whatsapp-projeto-e20df.appspot.com/o/profile%2Fperfil1.jpg?alt=media&token=4f14e473-61f9-47e6-8e17-401af6487d11"),
-    Chat("Welinys", "Olá tudo bem?",
-        "https://firebasestorage.googleapis.com/v0/b/whatsapp-projeto-e20df.appspot.com/o/profile%2Fperfil4.jpg?alt=media&token=29bc2237-c057-4805-874f-852a6f690633"),
-    Chat("Thamires", "Olá tudo bem?",
-        "https://firebasestorage.googleapis.com/v0/b/whatsapp-projeto-e20df.appspot.com/o/profile%2Fperfil2.jpg?alt=media&token=e3ce0afa-7006-4d08-90b2-2eb7fb325ad8"),
-    Chat("Vinícius", "Olá tudo bem?",
-        "https://firebasestorage.googleapis.com/v0/b/whatsapp-projeto-e20df.appspot.com/o/profile%2Fperfil2.jpg?alt=media&token=e3ce0afa-7006-4d08-90b2-2eb7fb325ad8"),
-  ];
+  List<UserModel> userList = [];
+
+  Future<List<UserModel>> _fetchContacts() async {
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    QuerySnapshot snapshot = await db.collection("users").get();
+    List<UserModel> users = [];
+    FirebaseAuth auth = FirebaseAuth.instance;
+    final currentUser = auth.currentUser;
+
+    for (QueryDocumentSnapshot item in snapshot.docs) {
+      var data = item.data() as Map?;
+      UserModel user = UserModel();
+      user.email = data?["_email"];
+      user.name = data?["_name"];
+      user.imageProfileUrl = data?["urlImage"] ?? "";
+      if (user.email == currentUser?.email) {
+        continue;
+      }
+      users.add(user);
+    }
+    return users;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: chatList.length,
-      itemBuilder: (context, index) {
-        Chat chat = chatList[index];
-        return ListTile(
-          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-          leading: CircleAvatar(
-            maxRadius: 30,
-            backgroundColor: Colors.grey,
-            backgroundImage: NetworkImage(chat.photoPath),
-          ),
-          title: Text(
-            chat.name,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          ),
-        );
+    return FutureBuilder<List<UserModel>>(
+      future: _fetchContacts(),
+      builder: (_, snap) {
+        switch (snap.connectionState) {
+          case ConnectionState.none:
+            return const Padding(
+              padding: EdgeInsets.all(20.0),
+              child: Text(
+                "Nenhum usuário cadastrado.",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            );
+          case ConnectionState.active:
+            return const Center(
+              child: Padding(
+                padding: EdgeInsets.all(20.0),
+                child: CircularProgressIndicator(),
+              ),
+            );
+          case ConnectionState.waiting:
+            return const Center(
+              child: Padding(
+                padding: EdgeInsets.all(20.0),
+                child: CircularProgressIndicator(),
+              ),
+            );
+          case ConnectionState.done:
+            return userList.isEmpty
+                ? const Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: Text(
+                      "Nenhum usuário cadastrado.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: userList.length,
+                    itemBuilder: (_, index) {
+                      UserModel user = userList[index];
+                      return ListTile(
+                        contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                        leading: CircleAvatar(
+                          maxRadius: 30,
+                          backgroundColor: Colors.grey,
+                          backgroundImage: NetworkImage(user.imageProfileUrl),
+                        ),
+                        title: Text(
+                          user.name,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                      );
+                    },
+                  );
+          default:
+            return const Text(
+              "Nenhum usuário cadastrado.",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            );
+        }
       },
     );
   }
