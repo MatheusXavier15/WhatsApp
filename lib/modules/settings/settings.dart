@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -58,22 +59,32 @@ class _SettingsState extends State<Settings> {
     String url = await snapshot.ref.getDownloadURL();
     setState(() {
       _fetchedUrlImage = url;
+      _updateUserPhoto(url);
     });
+  }
+
+  Future<void> _updateUserPhoto(String url) async {
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    db.collection("users").doc(_currentUser.uid).update({"urlImage": url});
+  }
+
+  Future<void> _updateUserName(String name) async {
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    db.collection("users").doc(_currentUser.uid).update({"_name": name});
   }
 
   Future<void> _recoverUserData() async {
     FirebaseAuth auth = FirebaseAuth.instance;
     _currentUser = auth.currentUser!;
-    FirebaseStorage storage = FirebaseStorage.instance;
-    Reference rootPaste = storage.ref();
-    Reference doc = rootPaste.child("profile").child("${_currentUser.uid}.jpg");
-    try {
-      final url = await doc.getDownloadURL();
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    final snapshot = await db.collection("users").doc(_currentUser.uid).get();
+    final data = snapshot.data();
+    _controllerName.text = data?["_name"];
+
+    if (data?["urlImage"] != null) {
       setState(() {
-        _fetchedUrlImage = url;
+        _fetchedUrlImage = data?["urlImage"];
       });
-    } catch (e) {
-      _fetchedUrlImage = "";
     }
   }
 
@@ -143,7 +154,12 @@ class _SettingsState extends State<Settings> {
                       backgroundColor:
                           MaterialStateProperty.all(const Color(0xFF25D366)),
                     ),
-                    onPressed: () {},
+                    onPressed: () async {
+                      if (_controllerName.text != "" &&
+                          _controllerName.text.isNotEmpty) {
+                        await _updateUserName(_controllerName.text.trim());
+                      }
+                    },
                     child: const Text("Salvar"),
                   ),
                 ),
