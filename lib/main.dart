@@ -1,7 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:whatsapp/login.dart';
+import 'package:whatsapp/modules/auth/login.dart';
+import 'package:whatsapp/routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,8 +20,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: const Login(),
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF075E54), secondary: const Color(0xFF25D366))
-      ),
+          colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color(0xFF075E54),
+              secondary: const Color(0xFF25D366))),
+      initialRoute: "/",
+      onGenerateRoute: Routes.generateRoute,
     );
   }
 }

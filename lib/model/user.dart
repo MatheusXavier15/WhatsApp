@@ -1,6 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:convert';
-
 class UserModel {
   late String _name;
   late String _email;
@@ -8,21 +5,21 @@ class UserModel {
 
   UserModel();
 
-  String get password => _password;
+  get password => _password;
 
-  set password(String value) {
+  set password(value) {
     _password = value;
   }
 
-  String get email => _email;
+  get email => _email;
 
-  set email(String value) {
+  set email(value) {
     _email = value;
   }
 
-  String get name => _name;
+  get name => _name;
 
-  set name(String value) {
+  set name(value) {
     _name = value;
   }
 
