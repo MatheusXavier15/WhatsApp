@@ -1,10 +1,14 @@
 class UserModel {
+  late String _id;
   late String _name;
   late String _email;
   late String _password;
   late String _imageProfileUrl;
 
   UserModel();
+  get id => _id;
+
+  set id(value) => _id = value;
 
   get password => _password;
 
