@@ -30,8 +30,20 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     Navigator.pushReplacementNamed(context, '/login');
   }
 
+  _verifyIfUserIsLoggedIn() {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final currentUser = auth.currentUser;
+    if (currentUser == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacementNamed('/login');
+      });
+      return;
+    }
+  }
+
   @override
   void initState() {
+    _verifyIfUserIsLoggedIn();
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
   }

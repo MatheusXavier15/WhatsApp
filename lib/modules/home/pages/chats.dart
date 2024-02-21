@@ -1,5 +1,11 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:whatsapp/model/chat.dart';
+import 'package:whatsapp/model/user.dart';
 
 class ChatsPage extends StatefulWidget {
   const ChatsPage({super.key});
@@ -9,40 +15,102 @@ class ChatsPage extends StatefulWidget {
 }
 
 class _ChatsPageState extends State<ChatsPage> {
-  List<Chat> chatList = [
-    Chat("Matheus Xavier", "Olá tudo bem?",
-        "https://firebasestorage.googleapis.com/v0/b/whatsapp-projeto-e20df.appspot.com/o/profile%2Fperfil1.jpg?alt=media&token=4f14e473-61f9-47e6-8e17-401af6487d11"),
-    Chat("Welinys", "Olá tudo bem?",
-        "https://firebasestorage.googleapis.com/v0/b/whatsapp-projeto-e20df.appspot.com/o/profile%2Fperfil4.jpg?alt=media&token=29bc2237-c057-4805-874f-852a6f690633"),
-    Chat("Thamires", "Olá tudo bem?",
-        "https://firebasestorage.googleapis.com/v0/b/whatsapp-projeto-e20df.appspot.com/o/profile%2Fperfil2.jpg?alt=media&token=e3ce0afa-7006-4d08-90b2-2eb7fb325ad8"),
-    Chat("Vinícius", "Olá tudo bem?",
-        "https://firebasestorage.googleapis.com/v0/b/whatsapp-projeto-e20df.appspot.com/o/profile%2Fperfil2.jpg?alt=media&token=e3ce0afa-7006-4d08-90b2-2eb7fb325ad8"),
-  ];
+  final _streamController = StreamController<QuerySnapshot>.broadcast();
+
+  final FirebaseFirestore db = FirebaseFirestore.instance;
+
+  final User currentUser = FirebaseAuth.instance.currentUser!;
+
+  _addChatListner() {
+    final stream = db
+        .collection("chats")
+        .doc(currentUser.uid)
+        .collection("lastChat")
+        .snapshots();
+
+    stream.listen((data) {
+      _streamController.add(data);
+    });
+  }
+
+  @override
+  void initState() {
+    _addChatListner();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _streamController.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: chatList.length,
-      itemBuilder: (context, index) {
-        Chat chat = chatList[index];
-        return ListTile(
-          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-          leading: CircleAvatar(
-            maxRadius: 30,
-            backgroundColor: Colors.grey,
-            backgroundImage: NetworkImage(chat.photoPath),
-          ),
-          title: Text(
-            chat.name,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          ),
-          subtitle: Text(
-            chat.message,
-            style: const TextStyle(color: Colors.grey, fontSize: 14),
-          ),
-        );
-      },
-    );
+    return StreamBuilder<QuerySnapshot>(
+        stream: _streamController.stream,
+        builder: (_, snap) {
+          if (snap.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snap.hasData) {
+            QuerySnapshot<Object?>? querySnapshot = snap.data;
+
+            if (querySnapshot != null && querySnapshot.docs.isEmpty) {
+              return const Center(
+                child: Text("Nenhuma conversa disponível ainda!"),
+              );
+            }
+
+            final chats = querySnapshot!.docs.toList();
+            return ListView.builder(
+              itemCount: chats.length,
+              itemBuilder: (context, index) {
+                DocumentSnapshot chat = chats[index];
+                return ListTile(
+                  onTap: () {
+                    final user = UserModel();
+                    user.id = chat["_receiverId"];
+                    user.name = chat["_name"];
+                    user.imageProfileUrl = chat["_photoPath"];
+                    Navigator.of(context).pushNamed('/chat', arguments: user);
+                  },
+                  contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                  leading: CircleAvatar(
+                    maxRadius: 30,
+                    backgroundColor: Colors.grey,
+                    backgroundImage: chat["_photoPath"] != null
+                        ? NetworkImage(chat["_photoPath"])
+                        : null,
+                  ),
+                  title: Text(
+                    chat["_name"],
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  subtitle: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        chat["_type"] == "text"
+                            ? chat["_message"]
+                            : "📷 imagem",
+                        style:
+                            const TextStyle(color: Colors.grey, fontSize: 14),
+                      ),
+                      Text(
+                        DateFormat.Hm()
+                            .format((chat["_createdAt"] as Timestamp).toDate()),
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          }
+          return Container();
+        });
   }
 }

@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:whatsapp/model/chat.dart';
 import 'package:whatsapp/model/user.dart';
 
 class ContactsPage extends StatefulWidget {
@@ -12,8 +11,6 @@ class ContactsPage extends StatefulWidget {
 }
 
 class _ContactsPageState extends State<ContactsPage> {
-  List<UserModel> userList = [];
-
   Future<List<UserModel>> _fetchContacts() async {
     FirebaseFirestore db = FirebaseFirestore.instance;
     QuerySnapshot snapshot = await db.collection("users").get();
@@ -24,6 +21,7 @@ class _ContactsPageState extends State<ContactsPage> {
     for (QueryDocumentSnapshot item in snapshot.docs) {
       var data = item.data() as Map?;
       UserModel user = UserModel();
+      user.id = item.id;
       user.email = data?["_email"];
       user.name = data?["_name"];
       user.imageProfileUrl = data?["urlImage"] ?? "";
@@ -64,7 +62,7 @@ class _ContactsPageState extends State<ContactsPage> {
               ),
             );
           case ConnectionState.done:
-            return userList.isEmpty
+            return snap.data!.isEmpty
                 ? const Padding(
                     padding: EdgeInsets.all(20.0),
                     child: Text(
@@ -77,10 +75,13 @@ class _ContactsPageState extends State<ContactsPage> {
                     ),
                   )
                 : ListView.builder(
-                    itemCount: userList.length,
+                    itemCount: snap.data!.length,
                     itemBuilder: (_, index) {
-                      UserModel user = userList[index];
+                      UserModel user = snap.data![index];
                       return ListTile(
+                        onTap: (){
+                          Navigator.of(context).pushNamed('/chat', arguments: user);
+                        },
                         contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                         leading: CircleAvatar(
                           maxRadius: 30,
