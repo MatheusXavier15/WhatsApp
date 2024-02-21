@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -31,6 +32,8 @@ class _ChatPageState extends State<ChatPage> {
   bool _uploadingImage = false;
 
   FirebaseFirestore db = FirebaseFirestore.instance;
+
+  final scrollController = ScrollController();
 
   Future<void> _saveMessage(
       String idSender, String idReceiver, Message msg) async {
@@ -69,7 +72,7 @@ class _ChatPageState extends State<ChatPage> {
     chatSender.save();
 
     Chat chatReceiver = Chat();
-    chatReceiver.senderId =  widget.contact.id;
+    chatReceiver.senderId = widget.contact.id;
     chatReceiver.receiverId = currentUser.uid;
     chatReceiver.name = widget.contact.name;
     chatReceiver.message = msg.messageText;
@@ -160,8 +163,13 @@ class _ChatPageState extends State<ChatPage> {
               }
               return Expanded(
                 child: ListView.builder(
+                  controller: scrollController,
                   itemCount: querySnapshot?.docs.length,
                   itemBuilder: (_, index) {
+                    Timer(const Duration(seconds: 2), () {
+                      scrollController
+                          .jumpTo(scrollController.position.maxScrollExtent);
+                    });
                     List<QueryDocumentSnapshot<Object?>> messages =
                         querySnapshot!.docs.toList();
                     QueryDocumentSnapshot msg = messages[index];
