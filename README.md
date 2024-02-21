@@ -32,9 +32,9 @@ As seguintes ferramentas foram usadas na construção do projeto:
 
 ### 📦 Packages
 
-- [firebase_core]: ^2.24.2
-- [firebase_auth]: ^4.16.0
-- [cloud_firestore]: ^4.14.0
-- [firebase_storage]: ^11.6.0
-- [image_picker]: ^1.0.7
-- [intl]: ^0.19.0
+- firebase_core: ^2.24.2
+- firebase_auth: ^4.16.0
+- cloud_firestore: ^4.14.0
+- firebase_storage: ^11.6.0
+- image_picker: ^1.0.7
+- intl: ^0.19.0
