@@ -1,16 +1,40 @@
-# whatsapp
+# WhatsApp Clone
 
-A new Flutter project.
+## O app simula uma versão do WhatsApp com algumas de suas principais funcionalidades utilizando Flutter e Firebase.
 
-## Getting Started
+![Badge](https://img.shields.io/static/v1?label=Flutter&message=3.13.0&color=blue&logo=flutter)
 
-This project is a starting point for a Flutter application.
+<h1 align="center">
+    <a href="https://flutter.dev">🔗 Flutter</a>
+</h1>
+<p align="center">🚀 Framework utilizada no projeto e pro desenvolvimento de Apps iOS e Android</p>
 
-A few resources to get you started if this is your first Flutter project:
+### ✅ Features
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- [x] Cadastro de usuários
+- [x] Upload de foto de perfil
+- [x] Edição de perfil
+- [x] Envio de mensagem de texto e imagem
+- [x] Últimos chats
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### ⁉️ Sobre
+
+    O app foi criado com o intuito de aprimorar as habilidades envolvendo o framework de criação de apps Flutter, juntamente com o Firebase
+    para o armazenamento de todos os dados envolvidos. O App apresenta as principais características da rede social WhatsApp , permitindo que você
+    troque a foto de perfil, inicie uma conversa em tempo real, envie fotos e mensagens de texto e etc.
+
+### 🛠 Tecnologias
+
+As seguintes ferramentas foram usadas na construção do projeto:
+
+- [Flutter](https://flutter.dev)
+- [Firebase](https://firebase.google.com/)
+
+### 📦 Packages
+
+- [firebase_core]: ^2.24.2
+- [firebase_auth]: ^4.16.0
+- [cloud_firestore]: ^4.14.0
+- [firebase_storage]: ^11.6.0
+- [image_picker]: ^1.0.7
+- [intl]: ^0.19.0
